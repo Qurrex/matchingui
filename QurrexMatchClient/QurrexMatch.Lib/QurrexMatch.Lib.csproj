@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FCA8D18D-5808-4B49-BD66-1F3B9FC7207D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>QurrexMatch.Lib</RootNamespace>
+    <AssemblyName>QurrexMatch.Lib</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Connection\ByteBuffer.cs" />
+    <Compile Include="Connection\OnMessageFromServer.cs" />
+    <Compile Include="Connection\SafeTcpClient.cs" />
+    <Compile Include="Connection\TcpAsynchClient.cs" />
+    <Compile Include="Model\AppSets.cs" />
+    <Compile Include="Model\BaseMessage.cs" />
+    <Compile Include="Model\Enumerations\LoggingLevel.cs" />
+    <Compile Include="Model\Enumerations\OrderSide.cs" />
+    <Compile Include="Model\Enumerations\OrderType.cs" />
+    <Compile Include="Model\Logger.cs" />
+    <Compile Include="Model\MessageParser.ResponseTimeStack.cs" />
+    <Compile Include="Model\QurrexConnection\Connection.cs" />
+    <Compile Include="Model\enums.cs" />
+    <Compile Include="Model\MessageHeader.cs" />
+    <Compile Include="Model\MessageParser.cs" />
+    <Compile Include="Model\MessageType.cs" />
+    <Compile Include="Model\QurrexConnection\ServerPackage.cs" />
+    <Compile Include="Model\Request\BaseRequest.cs" />
+    <Compile Include="Model\Request\CancelOrderRequest.cs" />
+    <Compile Include="Model\Request\MassCancelRequest.cs" />
+    <Compile Include="Model\Request\OrderRequest.cs" />
+    <Compile Include="Model\Response\BaseResponse.cs" />
+    <Compile Include="Model\Response\CancelOrderResponse.cs" />
+    <Compile Include="Model\Response\ExecReport\Deal.cs" />
+    <Compile Include="Model\Response\ExecReport\ExecReportBody.cs" />
+    <Compile Include="Model\Response\ExecReport\ExecutionReport.cs" />
+    <Compile Include="Model\Response\IOrigRequest.cs" />
+    <Compile Include="Model\Response\MassCancelResponse.cs" />
+    <Compile Include="Model\Response\OrderResponse.cs" />
+    <Compile Include="Model\Response\RejectResponse.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\ConverterExt.cs" />
+    <Compile Include="Util\ExecutablePath.cs" />
+    <Compile Include="Util\PropInfo.cs" />
+    <Compile Include="Util\ThreadSafeList.cs" />
+    <Compile Include="Util\TimeFormatter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

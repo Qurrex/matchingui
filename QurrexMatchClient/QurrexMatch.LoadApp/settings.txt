@@ -1,0 +1,52 @@
+﻿{
+  "PayloadSets": {
+    "Mode": 0,
+    "TradersCount": 80,
+    "ConnectionsCount": 40,
+    "SleepInterval": 16,
+    "RequestPerIterationProb": 99.0,
+    "SinusoidPeriodMs": 1500
+  },
+  "PricingSets": {
+    "PricingMode": 1,
+    "SinusPeriodMs": 3000,
+    "SinusAmplitudePercent": 1.0
+  },
+  "TradeSets": {
+    "ProbOfNewOrder": 60.0,
+    "ProbOfCancelOrder": 30.0,
+    "ProbOfMassCancel": 10.0,
+    "ProbOfAboveMarket": 5.0,
+    "ProbOfBelowMarket": 5.0,
+    "MakersCount": 0,
+    "OneShotTradersCount": 2,
+    "ProbErrorRequest": 1.0,
+    "RequestsBeforeGrabTheBook": 0,
+    "ProbOfGrabTheBook": 2.04
+  },
+  "MoneyManagementSets": {
+    "Tickers": [
+      {
+        "Name": "BTC/USD",
+        "Id": 1,
+        "DefaultPrice": 15000.0,
+        "MinVolume": 1E-08,
+        "PriceStep": 0.01
+      },
+      {
+        "Name": "ETH/USD",
+        "Id": 2,
+        "DefaultPrice": 1000.0,
+        "MinVolume": 1E-08,
+        "PriceStep": 0.01
+      }
+    ],
+    "FixedTickerIndex": 0,
+    "TradeRandomTicker": true,
+    "LotsMin": 10,
+    "LotsMax": 10
+  },
+  "Uri": "54.36.178.211:5001",
+  "StatisticsTimeframeSeconds": 1,
+  "LoggingLevel": 1
+}

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QurrexMatchClient", "QurrexMatchClient\QurrexMatchClient.csproj", "{E2E4CAFE-52B3-4054-8C44-D6889AF955E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QurrexMatch.Lib", "QurrexMatch.Lib\QurrexMatch.Lib.csproj", "{FCA8D18D-5808-4B49-BD66-1F3B9FC7207D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QurrexMatch.LoadApp", "QurrexMatch.LoadApp\QurrexMatch.LoadApp.csproj", "{A0CE4DB6-88D3-4280-A87F-C574569A9431}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QurrexMatch.Test", "QurrexMatch.Test\QurrexMatch.Test.csproj", "{07EDA806-0130-434F-9251-6CF8A5F14C7E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2E4CAFE-52B3-4054-8C44-D6889AF955E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2E4CAFE-52B3-4054-8C44-D6889AF955E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2E4CAFE-52B3-4054-8C44-D6889AF955E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2E4CAFE-52B3-4054-8C44-D6889AF955E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA8D18D-5808-4B49-BD66-1F3B9FC7207D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA8D18D-5808-4B49-BD66-1F3B9FC7207D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA8D18D-5808-4B49-BD66-1F3B9FC7207D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA8D18D-5808-4B49-BD66-1F3B9FC7207D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0CE4DB6-88D3-4280-A87F-C574569A9431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CE4DB6-88D3-4280-A87F-C574569A9431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0CE4DB6-88D3-4280-A87F-C574569A9431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CE4DB6-88D3-4280-A87F-C574569A9431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07EDA806-0130-434F-9251-6CF8A5F14C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07EDA806-0130-434F-9251-6CF8A5F14C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07EDA806-0130-434F-9251-6CF8A5F14C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07EDA806-0130-434F-9251-6CF8A5F14C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {986E41EC-AE6A-45EC-AFF0-BDDB394B23D1}
+	EndGlobalSection
+EndGlobal

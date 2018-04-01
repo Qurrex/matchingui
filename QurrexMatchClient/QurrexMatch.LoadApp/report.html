@@ -1,0 +1,801 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous"></link>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"></link>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="rawdata.js"></script>
+    <script src="serverstat.js"></script>
+    <style type="text/css">
+        body {
+            margin: 5px;
+        }
+
+        table.sum-table {
+            border-spacing: 0px;
+            border: solid 1px black;
+            border-right: 0px;
+        }
+
+        table.sum-table td {
+            padding: 4px 6px;
+        }
+
+        table.sum-table td:nth-child(even) {
+            border-right: solid 1px black;
+        }
+
+        table.sum-table tr:nth-child(odd) {
+            background-color: #D8D8FF;
+        }
+
+        .chart-div {
+            max-width: 900px;
+            max-height: 400px;
+        }
+
+        table.messages-count td {
+            vertical-align: top;
+        }
+
+        table.messages-count table td {
+            padding: 4px;
+        }
+
+        table.messages-count th {
+            padding: 4px;
+            font-weight: normal;
+            background-color: #D8D8FF;
+        }
+    </style>
+</head>
+<body>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#test_sum">Test summary</a></li>
+        <li><a data-toggle="tab" href="#test_sets">Test settings</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="test_sum" class="tab-pane fade in active">
+            Activities: <span id="traderRolesSpan"></span>
+            <br />
+
+            <h4>Summary</h4>
+            <table id="summaryTable" class="sum-table">
+                <tr>
+                    <td>Elapsed</td>
+                    <td data-prop="Elapsed"></td>
+                    <td>Started</td>
+                    <td data-prop="timeStartedStr"></td>
+                    <td>Finished</td>
+                    <td data-prop="timeFinishedStr"></td>
+                </tr>
+                <tr>
+                    <td>Requests</td>
+                    <td data-prop="TotalReqsSend"></td>
+                    <td>Responses</td>
+                    <td data-prop="totalResponses"></td>
+                    <td>Exec reports</td>
+                    <td data-prop="executionReports"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="test_sets" class="tab-pane fade">
+            <h4>Settings</h4>
+            <table id="settingsTable" class="sum-table">
+                <tr>
+                    <td>Timeframe</td>
+                    <td><span data-prop="StatisticsTimeframeSeconds"></span>s</td>
+                    <td>Payload mode</td>
+                    <td data-prop="Mode"></td>
+                    <td>Server connections</td>
+                    <td data-prop="ConnectionsCount"></td>
+                </tr>
+                <tr>
+                    <td>Takers</td>
+                    <td data-prop="takersCount"></td>
+                    <td>Makers</td>
+                    <td data-prop="MakersCount"></td>
+                    <td>Whole book traders</td>
+                    <td data-prop="OneShotTradersCount"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <br />
+
+    <table class="messages-count">
+        <tr>
+            <td><div id="messagesSentByTypeContainer"></div> &nbsp;&nbsp;&nbsp; </td>
+            <td><div id="messagesByTypeContainer"></div></td>
+        </tr>
+    </table>
+
+    <br />
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#latency">Latency</a></li>
+        <li><a data-toggle="tab" href="#exec">Execution reports</a></li>
+        <li><a data-toggle="tab" href="#server">Server statistics</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="latency" class="tab-pane fade in active">
+            <div class="chart-div" id="responsesTimeChart"></div>
+			
+            <br />
+            <div class="chart-div" id="latencyProfileChart"></div>
+            
+            <br />
+            <div class="chart-div" style="min-height: 700px" id="responsesCountChart"></div>
+
+            <br />
+            <div class="chart-div" id="timeFromLoadChart"></div>
+
+            <br />
+            <div class="chart-div" id="timeFromTestLoadChart"></div>
+
+            <br />
+            <div class="chart-div" id="responsesWaitingChart"></div>
+        </div>
+
+        <div id="exec" class="tab-pane fade">
+            <div class="chart-div" id="execPriceChart"></div>
+        </div>
+
+        <div id="server" class="tab-pane fade">
+            <div class="chart-div" style="display: none" id="serverOrdersDiv"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            window.model = new AccountStat();
+            model.refresh();
+        });
+
+        function AccountStat() {
+        }
+
+        AccountStat.prototype.refresh = function () {
+            var that = this;
+            that.renderData(window.rawdata);
+        }
+
+        AccountStat.prototype.renderData = function (data) {
+            //console.log(data);
+            this.statistics = data;
+            this.renderTables(data);
+
+            this.renderTradersByRole(data);
+            this.renderCharts(data);
+            this.makePayloadRoundripCharts();
+            this.renderMessageByType(data);
+            this.renderServerStat();
+        }
+
+        AccountStat.prototype.renderTables = function (data) {
+            this.mapPropToTable('summaryTable', data);
+
+            data.settings.takersCount = data.settings.PayloadSets.TradersCount -
+                data.settings.TradeSets.MakersCount - data.settings.TradeSets.OneShotTradersCount;
+            this.mapPropToTable('settingsTable', data.settings);
+            this.mapPropToTable('settingsTable', data.settings.PayloadSets);            
+            this.mapPropToTable('settingsTable', data.settings.TradeSets);
+            var calcData = {
+                timeStartedStr: stringifyDateTime(new Date(data.timeStarted)),
+                timeFinishedStr: stringifyDateTime(new Date(data.timeFinished))
+            };
+            this.mapPropToTable('summaryTable', calcData);
+        }
+
+        AccountStat.prototype.renderServerStat = function () {
+            if (!window.serverStat) return;
+            var series = [
+                {
+                    name: 'Active orders',
+                    field: 'active_orders',
+                    type: 'line',
+                    data: []
+                }, {
+                    name: '95% order processing time, us',
+                    field: 'adds_avg_95_tm',
+                    type: 'line',
+                    data: []
+                }
+            ];
+            for (var i = 0; i < window.serverStat.length; i++) {
+                var record = window.serverStat[i];
+                var time = new Date(record.time).getTime();
+                for (var j = 0; j < series.length; j++)
+                    series[j].data.push({
+                        x: time,
+                        y: record[series[j].field]
+                    });
+            }
+
+            $('#serverOrdersDiv').show();
+            this.renderChart('serverOrdersDiv', 'Server: active orders', [series[0]]);
+		}
+
+        AccountStat.prototype.renderTradersByRole = function (data) {
+            var sb = [];
+            for (var key in data.tradersByRole)
+                sb.push(key + ': ' + data.tradersByRole[key]);
+            var str = sb.join(', ') + '.';
+            $('#traderRolesSpan').text(str);
+        }
+
+        AccountStat.prototype.renderCharts = function (data) {
+            // prepare charts data
+            var seriesReqCount = this.packSeriesScalar(data.requestsPerSecond.Values);
+            var seriesRespCount = this.packSeriesScalar(data.responsesPerSecond.Values);
+            var seriesExecPrice = this.packSeriesOHLC(data.execPriceCandles.Candles);
+			
+			var roundtripPerc = this.packVectorData(data.roundtripTimes.Vectors, [0, 50, 90, 95, 99]);
+
+            this.renderChart('responsesTimeChart', 'Latency (Request/response roundtrip), ms',
+                [{
+                    name: 'min',
+                    type: 'line',
+                    data: roundtripPerc[0].data,
+                    tooltip: { valueDecimals: 0 }
+                }, {
+                    name: '50%',
+                    type: 'line',
+                    data: roundtripPerc[1].data,
+                    tooltip: { valueDecimals: 0 }
+                }, {
+                    name: '90%',
+                    type: 'line',
+                    data: roundtripPerc[2].data,
+                    tooltip: { valueDecimals: 0 }
+                }, {
+                    name: '95%',
+                    type: 'line',
+                    data: roundtripPerc[3].data,
+                    tooltip: { valueDecimals: 0 }
+                }, {
+                    name: '99%',
+                    type: 'line',
+                    data: roundtripPerc[4].data,
+                    tooltip: { valueDecimals: 0 }
+                }]);
+            this.renderRequestsResponsesCharts();
+            this.renderLatencyProfileChart('latencyProfileChart');
+            this.renderChart('execPriceChart', 'Execution price',
+                [{
+                    name: 'Time',
+                    type: 'candlestick',
+                    data: seriesExecPrice.splice(1), // Первая свечка рассчитывается с ошибкой и содержит нулевые значения. Это не так важно, проще ее игнорировать.
+                    tooltip: { valueDecimals: 2 }
+                }]);
+        }
+
+		AccountStat.prototype.getPercentile = function (array, percentile, isSorted) {
+            var arr = array;
+            if (!isSorted) {
+                arr.sortNumbers();
+            }
+            var index = Math.ceil(arr.length*percentile/100)-1;
+            return arr[index];
+        }
+
+        AccountStat.prototype.renderLatencyProfileChart = function (name) {
+            // разделить массив задержек на 100 частей, чтобы вывести на график. 
+			// x - задержка в ms, y - вероятность попадания в интервал.
+            var series = new Array(100);
+            var fullStatistics = [];
+            window.rawdata.roundtripTimes.Vectors.forEach(element => { element.vector.forEach(x => fullStatistics.push(x)) });
+            fullStatistics = fullStatistics.filter(x => x != 0); // FIXME: Пока в отчете попадаются нулевые задержки надо фильтровать.
+            fullStatistics.sortNumbers();
+            fullStatistics = fullStatistics.map(el=>el/1000) // переведем микросекунды в миллисекунды
+            var min = fullStatistics[0];
+			var maxPercentile = 0.99;
+            var maxIndex = Math.ceil(fullStatistics.length*maxPercentile-1); 
+            var max = fullStatistics[maxIndex];
+            var increment = (max - min) / series.length;
+            var previndex = 0;
+            for (var i = 0; i < series.length; i++) {
+                var x = Math.round(min + (i + 1) * increment);
+                var index = fullStatistics.findIndex((el, index) => el >= x ? index : false);
+                var y = (index - previndex) / fullStatistics.length;
+                series[i] = [x, y];
+                previndex = index;
+            }
+            var p_2 = this.getPercentile(fullStatistics, 2, true);
+            var p_25 = this.getPercentile(fullStatistics, 25, true);
+            var p_50 = this.getPercentile(fullStatistics, 50, true);
+            var p_75 = this.getPercentile(fullStatistics, 75, true);
+            var p_98 = this.getPercentile(fullStatistics, 98, true);
+            var p_max = this.getPercentile(fullStatistics, maxPercentile, true); // Этот процентиль используется, чтобы ограничить график по оси X
+
+            new Highcharts.chart(name,{
+                chart:{type:"line"},
+                title:{text:"Probability Distribution: Latency"},
+                tooltip:{
+                    headerFormat: 'Latency: <b>{point.x} ms</b>',
+                    pointFormat:'',
+                    enabled: true
+                },
+                yAxis:{
+                    title:{text:"Probability"},
+                    labels:{
+                        enabled: false
+                    }
+                },
+                xAxis:{
+                    title:{text:"Latency, ms"},
+                    max: p_max,
+					plotBands: [{
+                        color: 'yellow',
+                        from: p_25,
+                        to: p_75,
+                        label: { text: '25%-75%' },
+                        zIndex: -1
+                    }],
+                    plotLines: [{
+                        color: 'red',
+                        value: p_50,
+                        width: 1,
+                        label: { text: 'median', verticalAlign: 'middle' }
+                    },{
+                        color: 'black',
+                        value: p_2,
+                        width: 1,
+                        label: { text: '2%' }
+                    }, {
+                        color: 'black',
+                        value: p_98,
+                        width: 1,
+                        label: { text: '98%' }
+                    }],
+                    labels: {
+                        formatter: function () {
+                            return this.value + 'ms'
+                        }
+                    }
+                },
+                legend: {enabled: false},
+                series: [{
+                    marker: {
+                        enabled: false
+                    },
+                    data: series
+                }]
+            })
+        }
+
+        AccountStat.prototype.renderRequestsResponsesCharts = function () {
+            var data = this.statistics;
+            var waitingResponses = this.packVolumesFromVectorData(data.roundtripTimes.Vectors);
+
+            if (!data.requestsPerSecond.Values.length) return;
+            // req per sec, resp per sec
+            // req per sec total, resp per sec total
+            var respsOnTime = arrayToHash(data.responsesPerSecond.Values);
+            var srData = [[], [], [], [], []];
+            var reqsSum = 0, respsSum = 0;
+            for (var i = 0; i < data.requestsPerSecond.Values.length; i++) {
+                var t = new Date(data.requestsPerSecond.Values[i].t).getTime();
+                var reqs = data.requestsPerSecond.Values[i].v;
+                reqsSum += reqs;
+
+                var resps = respsOnTime[t];
+                if (resps === undefined) continue;
+                respsSum += resps;
+
+                srData[0].push({ x: t, y: reqs });
+                srData[1].push({ x: t, y: resps });
+                srData[2].push({ x: t, y: reqsSum });
+                srData[3].push({ x: t, y: respsSum });
+            }
+
+            srData[4] = waitingResponses;
+
+            new Highcharts.StockChart({
+                chart: { 
+                	renderTo: 'responsesCountChart',
+                	height: 660
+                },
+				rangeSelector: {
+                    buttons: [{
+                        type: 'second',
+                        count: 30,
+                        text: '30sec'
+                    }, {
+                        type: 'minute',
+                        count: 1,
+                        text: '1min'
+                    }, {
+                        type: 'all',
+                        count: 1,
+                        text: 'All'
+                    }],
+                    selected: 2,
+                    inputEnabled: false
+                },
+                tooltip: {},
+                title: { text: 'Requests / responses per ' + data.timeframeSeconds + ' s'},
+                series: [{
+                        type: 'line',
+                        name: 'Requests',
+                        data: srData[0],
+                        yAxis: 0
+                    }, {
+                        type: 'line',
+                        name: 'Responses',
+                        data: srData[1],
+                        yAxis: 0
+                    },{
+                        type: 'area',
+                        name: 'Requests without response',
+                        data: srData[4],
+                        yAxis: 1,
+                        zIndex: -1
+                    },{
+                        type: 'line',
+                        name: 'Requests total',
+                        data: srData[2],
+                        yAxis: 1
+                    }, {
+                        type: 'line',
+                        name: 'Responses total',
+                        data: srData[3],
+                        yAxis: 1
+                    }
+                ],
+                yAxis: [{   
+                            title: { text: 'Requests / responses' },
+                            opposite: false,
+                            height: '60%',
+                            lineWidth: 2
+                    }, {
+                            title: { text: 'Requests total / responses total' },
+                            opposite: false,
+                            offset: 0,
+                            top: '65%',
+                            height: '35%',
+                            lineWidth: 2
+                    }
+                ],
+                tooltip: { split: true }
+            });
+        }
+
+        AccountStat.prototype.packSeriesOHLC = function (data) {
+            var r = 0;
+            var sr = [];
+            if (!data.length) return sr;
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                var date = new Date(d.t).getTime();
+
+                sr.push({
+                    x: date,
+                    open: r,
+                    high: Math.max(r, d.h),
+                    low: Math.min(r, d.l),
+                    close: d.c
+                });
+                r = d.c;
+            }
+            return sr;
+        }
+
+        AccountStat.prototype.packSeriesMedium = function (data) {
+            var r = 0;
+            var sr = [];
+            if (!data.length) return sr;
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                var date = new Date(d.t).getTime();
+                var medium = d.s / d.v;
+                sr.push({
+                    x: date,
+                    open: medium,
+                    high: Math.max(r, d.h),
+                    low: Math.min(r, d.l),
+                    close: medium
+                });
+                r = d.c;
+            }
+            return sr;
+        }
+
+        AccountStat.prototype.packSeriesScalar = function (data) {
+            var sr = [];
+            if (!data.length) return sr;
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                var date = new Date(d.t).getTime();
+                sr.push({
+                    x: date,
+                    y: d.v
+                });
+            }
+            return sr;
+        }
+
+        AccountStat.prototype.mapPropToTable = function(table, obj) {
+            for (var prop in obj) {
+                $('#' + table + ' *[data-prop="' + prop + '"]').each(function (i, val) {
+                    $(this).text(obj[prop]);
+                });
+            }
+        }
+
+        AccountStat.prototype.renderChart = function (contId, name, seriesArr, options) {
+            var xAxis = {};
+            if (options && options.xAxis)
+                xAxis = options.xAxis;
+            var tooltip = {};
+            if (options && options.tooltip)
+                tooltip = options.tooltip;
+            var chart = new Highcharts.StockChart({
+                chart: { renderTo: contId },
+                tooltip: tooltip,
+                title: { text: name },
+
+                rangeSelector: {
+                    buttons: [{
+                        type: 'second',
+                        count: 30,
+                        text: '30sec'
+                    }, {
+                        type: 'minute',
+                        count: 1,
+                        text: '1min'
+                    }, {
+                        type: 'all',
+                        count: 1,
+                        text: 'All'
+                    }],
+                    selected: 2,
+                    inputEnabled: false
+                },
+
+                series: seriesArr
+            });
+        }
+
+        AccountStat.prototype.renderMessageByType = function (data) {
+            this.renderHashAsTable(data.messagesSentByType, 'Messages sent', '#messagesSentByTypeContainer');
+            this.renderHashAsTable(data.messagesParsedByType, 'Messages received', '#messagesByTypeContainer');
+        }
+
+        AccountStat.prototype.renderHashAsTable = function (hash, title, containerSelector) {
+            var markup = '<table> <tr> <th colspan="2">' + title + '</th></tr>';
+            for (var key in hash)
+                markup += '<tr><td>' + key + '</td><td>' + hash[key] + '</td></tr>';
+            markup += '</table>';
+            $(containerSelector).html(markup);
+        }
+
+        AccountStat.prototype.packVectorData = function (src, percentiles) {
+            var series = [];
+            for (var i = 0; i < percentiles.length; i++)
+                series.push({
+                    percentile: percentiles[i],
+                    data: []
+                });
+            series.push({
+                data: []
+            });
+            for (var i = 0; i < src.length; i++) {
+                var date = new Date(src[i].t).getTime();
+                var sorted = src[i].vector.sortNumbers();
+                
+				for (var j = 0; j < percentiles.length; j++) {
+                    if (sorted.length == 0) {
+                        series[j].data.push({ x: date, y: 0 });
+                        continue;
+                    }
+                    var p = percentiles[j];
+                    // считаем процентиль за секунду и переводим в микросекунды в миллисекунды
+                    var val = Math.round(this.getPercentile(sorted, p, true)/1000);
+                    series[j].data.push({ x: date, y: val });
+                }
+            }
+            return series;
+        }
+
+        AccountStat.prototype.packVolumesFromVectorData = function (src) {
+            var data = [];
+            for (var i = 0; i < src.length; i++) {
+                var date = new Date(src[i].t).getTime();
+                data.push({
+                    x: date,
+                    y: src[i].volume
+                });
+            }
+            return data;
+        }
+
+        AccountStat.prototype.makePayloadRoundripCharts = function () {
+            var avgRoundtrips = window.rawdata.roundtripTimes.Vectors.map(function (x) {
+                var avgRoundtrip = {};
+                avgRoundtrip.t = new Date(x.t);
+                avgRoundtrip.v = average(x.vector);
+                return avgRoundtrip;
+            });
+            var seriesAppLoadToRoundtrips = this.makeRoundtripByLoadSeries(avgRoundtrips, this.statistics.requestsPerSecond.Values);
+            this.makePayloadRegressionChart(seriesAppLoadToRoundtrips, 'timeFromTestLoadChart', 'TPS in application / Average latency');
+
+            if (!window.serverStat) return;
+
+            var serverLoadStat = window.serverStat.map(function (x) {
+                var loadByTime = {};
+                loadByTime.t = x.time;
+                loadByTime.v = x.adds_per_sec;
+                return loadByTime;
+            });
+
+            var seriesLoadToRoundtrips = this.makeRoundtripByLoadSeries(avgRoundtrips, serverLoadStat);
+            this.makePayloadRegressionChart(seriesLoadToRoundtrips, 'timeFromLoadChart', 'Transactions per second (TPS) on server / Average latency');
+        }
+
+        AccountStat.prototype.makeRoundtripByLoadSeries = function (avgRoundtrips, loadStat) {
+            var seriesLoadToRoundtrips = [];
+            loadStat.forEach(function (el) {
+                var t = new Date(el.t).getTime();
+                var avgRoundtrip = avgRoundtrips.find(obj => obj.t.valueOf() == t);
+                if (avgRoundtrip === undefined) return;
+                var x = el.v;
+                var y = Math.round(avgRoundtrip.v / 1000); //convert to ms
+                seriesLoadToRoundtrips.push([x, y]);
+            });
+            return seriesLoadToRoundtrips;
+        }
+
+        AccountStat.prototype.makePayloadRegressionChart = function (seriesLoadToRoundtrips, chartContainer, title) {
+            var lr = linearRegression(seriesLoadToRoundtrips.map(x => x[0]), seriesLoadToRoundtrips.map(x => x[1]));
+            var lr_x1 = minInArray(seriesLoadToRoundtrips.map(x => x[0]));
+            var lr_y1 = lr.intercept + lr.slope * lr_x1;
+            var lr_x2 = maxInArray(seriesLoadToRoundtrips.map(x => x[0]));
+            var lr_y2 = lr.intercept + lr.slope * lr_x2;
+
+            var seriesTimeFromLoad = [{
+                type: 'line',
+                name: 'Regression Line',
+                data: [[lr_x1, lr_y1], [lr_x2, lr_y2]],
+                marker: { enabled: false },
+                states: { hover: { lineWidth: 0 } },
+                enableMouseTracking: false,
+                tooltip: { pointFormat: '' }
+            },
+            {
+                type: 'scatter',
+                name: 'Values',
+                data: seriesLoadToRoundtrips,
+                marker: { radius: 4 }
+            }];
+
+            Highcharts.chart({
+                chart: { renderTo: chartContainer },
+                title: { text: title },
+                series: seriesTimeFromLoad,
+                tooltip: {
+                    pointFormat: 'TPS: {point.x}<br/>Latency: {point.y} ms<br />'
+                }
+            });
+        }
+
+        function linearRegression(x, y) {
+            var lr = {};
+            var n = y.length;
+            var sum_x = 0;
+            var sum_y = 0;
+            var sum_xy = 0;
+            var sum_xx = 0;
+            var sum_yy = 0;
+
+            for (var i = 0; i < y.length; i++) {
+
+                sum_x += x[i];
+                sum_y += y[i];
+                sum_xy += (x[i] * y[i]);
+                sum_xx += (x[i] * x[i]);
+                sum_yy += (y[i] * y[i]);
+            }
+
+            lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x);
+            lr['intercept'] = (sum_y - lr.slope * sum_x) / n;
+            lr['r2'] = Math.pow((n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_xx - sum_x * sum_x) * (n * sum_yy - sum_y * sum_y)), 2);
+
+            return lr;
+        }
+
+        function makeStringFromHash(hash, keyValueSt, pairSt) {
+            var items = [];
+            for (var prop in hash) {
+                items.push(prop + keyValueSt + hash[prop]);
+            }
+            return items.join(pairSt);
+        }
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        function stringifyDateTime(utcDate) {
+            return stringifyDate(utcDate) + ' ' +
+                pad(utcDate.getHours(), 2) + ':' + pad(utcDate.getMinutes(), 2) + ':' + pad(utcDate.getSeconds(), 2);
+        }
+
+        function stringifyDate(utcDate) {
+            return pad(utcDate.getDate(), 2) + '.' + pad(utcDate.getMonth() + 1, 2) + '.' + utcDate.getFullYear();
+        }
+
+        function pad(num, size) {
+            var s = num + "";
+            while (s.length < size) s = "0" + s;
+            return s;
+        }
+
+        function average(arr) {
+            if (arr.length == 0) return 0;
+            var sum = 0;
+            for (var i = 0; i < arr.length; i++)
+                sum += arr[i];
+            return sum / arr.length;
+        }
+
+        function maxInArray(arr) {
+            if (arr.length == 0) return 0;
+            var max = arr[0];
+            for (var i = 1; i < arr.length; i++)
+                max = Math.max(arr[i], max);
+            return max;
+        }
+
+        function minInArray(arr) {
+            if (arr.length == 0) return 0;
+            var min = arr[0];
+            for (var i = 1; i < arr.length; i++)
+                min = Math.min(arr[i], min);
+            return min;
+        }
+
+        function mapArray(arr, func) {
+            var processed = [];
+            for (var i = 0; i < arr.length; i++)
+                processed.push(func(arr[i], i));
+            return processed;
+        }
+
+        function arrayToHash(arr) {
+            var h = {};
+            for (var i = 0; i < arr.length; i++) {
+                var key = new Date(arr[i].t).getTime();
+                var val = arr[i].v;
+                h[key] = val;
+            }
+            return h;
+        }
+		
+        Array.prototype.sortNumbers = function() {
+            return this.sort((a,b)=>a-b);
+        }
+    </script>
+
+</body>
+</html>
