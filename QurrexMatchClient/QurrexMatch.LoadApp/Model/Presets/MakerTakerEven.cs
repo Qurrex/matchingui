@@ -24,7 +24,9 @@ namespace QurrexMatch.LoadApp.Model.Presets
             {
                 PricingSets = new TradersSettings.PricingSettings
                 {
-                    PricingMode = PricingSettingsMode.Fixed
+                    PricingMode = PricingSettingsMode.Sinusoidal,
+                    SinusAmplitudePercent = 1.5m,
+                    SinusPeriodMs = 1000 * 10
                 },
                 MoneyManagementSets = new TradersSettings.MoneyManagementSettings
                 {
