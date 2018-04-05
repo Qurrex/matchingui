@@ -42,7 +42,7 @@ namespace QurrexMatch.Lib.Model.QurrexConnection
         /// next request Id, starts from 0
         /// unique per connection (session)
         /// </summary>
-        private Int64 nextSessionId = 0;
+        private Int64 nextSessionId;
 
         /// <summary>
         /// an object that parses messages received from the server
@@ -90,6 +90,7 @@ namespace QurrexMatch.Lib.Model.QurrexConnection
         /// </summary>
         public void Open()
         {
+            nextSessionId = 0;
             conn = new SafeTcpClient
             {
                 onLogMessage = logMessage,

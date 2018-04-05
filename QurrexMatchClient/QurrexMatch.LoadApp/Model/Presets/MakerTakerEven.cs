@@ -60,14 +60,12 @@ namespace QurrexMatch.LoadApp.Model.Presets
             if (payload < 4)
             {
                 paySets.TradersCount = payload * 5;
-                paySets.ConnectionsCount = payload * 2;
                 paySets.SleepInterval = 30;
             }
             else
             {
                 sets.TradeSets.MakersCount = 2;
                 paySets.TradersCount = payload * 10;
-                paySets.ConnectionsCount = payload * 6;
                 paySets.SleepInterval = 7;
             }
 
@@ -85,8 +83,7 @@ namespace QurrexMatch.LoadApp.Model.Presets
             var rps = reqPerSecTakers + makersReq;
 
             var makersStr = sets.TradeSets.MakersCount > 1 ? "makers" : "maker";
-            return $"{sets.PayloadSets.TradersCount} \"takers\" and {sets.TradeSets.MakersCount} {makersStr} " + 
-                $"sharing {sets.PayloadSets.ConnectionsCount} connections.\n" +
+            return $"{sets.PayloadSets.TradersCount} \"takers\" and {sets.TradeSets.MakersCount} {makersStr}.\n" +
                 $"~ {rps:F1} requests per second";
         }
     }

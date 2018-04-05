@@ -24,11 +24,6 @@ namespace QurrexMatch.LoadApp.Model
             public int TradersCount { get; set; } = 8;
 
             /// <summary>
-            /// count of TCP-IP connections shared among the threads
-            /// </summary>
-            public int ConnectionsCount { get; set; } = 2;
-
-            /// <summary>
             /// an interval between seding requests, mils
             /// </summary>
             public int SleepInterval { get; set; } = 100;

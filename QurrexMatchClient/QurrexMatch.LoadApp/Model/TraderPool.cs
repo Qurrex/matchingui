@@ -92,7 +92,7 @@ namespace QurrexMatch.LoadApp.Model
             var fairPriceMaker = new FairPriceMaker(settings);
             try
             {
-                for (var i = 0; i < settings.PayloadSets.ConnectionsCount; i++)
+                for (var i = 0; i < settings.PayloadSets.TradersCount; i++)
                 {
                     var conn = new Connection(settings.Uri, logger, i);
                     conn.onResponse += OnResponse;
@@ -175,8 +175,7 @@ namespace QurrexMatch.LoadApp.Model
 
             foreach (var conn in connectionPool)
                 try
-                {
-                
+                {                
                     conn.Close();
                 }
                 catch (Exception ex)

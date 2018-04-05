@@ -86,6 +86,7 @@ namespace QurrexMatch.Lib.Connection
         {
             if (!isAlive) return;
             Thread.Sleep(200);
+            if (!isAlive) return;
             onLogMessage?.LogMessage("reconnecting", LoggingLevel.Critical, LogMessageCode.ConnectionReconnect);
             isAlive = false;
             CloseConnection();

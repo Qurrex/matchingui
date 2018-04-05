@@ -15,7 +15,6 @@ namespace QurrexMatch.LoadApp.Dialogs
             InitializeComponent();
 
             ControlsValidation.SetupErrorProvider(out tbThreadsCountErrorProvider, tbThreadsCount);
-            ControlsValidation.SetupErrorProvider(out tbConnectionsCountErrorProvider, tbConnectionsCount);
             ControlsValidation.SetupErrorProvider(out tbIntervalMsErrorProvider, tbIntervalMs);
             ControlsValidation.SetupErrorProvider(out tbPropOfPlacingOrderErrorProvider, tbPropOfPlacingOrder);
             ControlsValidation.SetupErrorProvider(out tbFadeInPeriodErrorProvider, tbFadeInPeriod);
@@ -25,7 +24,6 @@ namespace QurrexMatch.LoadApp.Dialogs
         public LoadSettingsDialog(TradersSettings sets) : this()
         {
             this.sets = sets;
-            tbConnectionsCount.Text = sets.PayloadSets.ConnectionsCount.ToString();
             tbIntervalMs.Text = sets.PayloadSets.SleepInterval.ToString();
             tbThreadsCount.Text = sets.PayloadSets.TradersCount.ToString();
             tbPropOfPlacingOrder.Text = sets.PayloadSets.RequestPerIterationProb.ToStringDefault();
@@ -54,14 +52,13 @@ namespace QurrexMatch.LoadApp.Dialogs
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            if (!IsTbThreadsCountValid() || !IsTbConnectionsCountValid() || !IsTbIntervalMsValid()
+            if (!IsTbThreadsCountValid() || !IsTbIntervalMsValid()
                 || !IsTbPropOfPlacingOrderValid() || !IsTbFadeInPeriodValid() || !IsTbPayloadSinusPeriodMsValid())
             {
                 DialogResult = DialogResult.None;
                 return;
             }
 
-            sets.PayloadSets.ConnectionsCount = Int32.Parse(tbConnectionsCount.Text);
             sets.PayloadSets.SleepInterval = Int32.Parse(tbIntervalMs.Text);
             sets.PayloadSets.TradersCount = Int32.Parse(tbThreadsCount.Text);
             sets.PayloadSets.RequestPerIterationProb = tbPropOfPlacingOrder.Text.ToDecimal();
@@ -88,16 +85,6 @@ namespace QurrexMatch.LoadApp.Dialogs
             return ControlsValidation.TexBoxTypeValidation(tbThreadsCount, "threads count", tbThreadsCountErrorProvider, typeof(int));
         }
 
-        private void tbConnectionsCount_Validated(object sender, EventArgs e)
-        {
-            IsTbConnectionsCountValid();
-        }
-
-        private bool IsTbConnectionsCountValid()
-        {
-            return ControlsValidation.TexBoxTypeValidation(tbConnectionsCount, "connections count", tbConnectionsCountErrorProvider, typeof(int));
-        }
-
         private void tbIntervalMs_Validated(object sender, EventArgs e)
         {
             IsTbIntervalMsValid();
@@ -105,7 +92,8 @@ namespace QurrexMatch.LoadApp.Dialogs
 
         private bool IsTbIntervalMsValid()
         {
-            return ControlsValidation.TexBoxTypeValidation(tbIntervalMs, "interval", tbIntervalMsErrorProvider, typeof(int));
+            return ControlsValidation.TextBoxRangeValidation(tbIntervalMs, "interval", 
+                tbIntervalMsErrorProvider, 0, 1000, typeof(int));
         }
 
         private void tbPropOfPlacingOrder_Validated(object sender, EventArgs e)
@@ -115,7 +103,8 @@ namespace QurrexMatch.LoadApp.Dialogs
 
         private bool IsTbPropOfPlacingOrderValid()
         {
-            return ControlsValidation.TextBoxRangeValidation(tbPropOfPlacingOrder, "prob of placing", tbPropOfPlacingOrderErrorProvider, 0, 100, typeof(int));
+            return ControlsValidation.TextBoxRangeValidation(tbPropOfPlacingOrder, "prob of placing", tbPropOfPlacingOrderErrorProvider, 
+                0, 100, typeof(int));
         }
 
         private void tbFadeInPeriod_Validated(object sender, EventArgs e)

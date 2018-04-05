@@ -46,6 +46,8 @@ namespace QurrexMatch.Lib.Connection
 
         private volatile bool isStopping;
 
+        private volatile bool isConnected;
+
         /// <summary>
         /// internal socket client
         /// </summary>
@@ -53,11 +55,12 @@ namespace QurrexMatch.Lib.Connection
 
         public void Connect(string uri)
         {
+            isConnected = false;
             isStopping = false;
             var hostPort = uri.Split(':');
             var host = hostPort[0];
             var port = int.Parse(hostPort[1]);
-            client = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            client = new Socket(SocketType.Stream, ProtocolType.Tcp) {SendTimeout = 500};
             try
             {
                 client.BeginConnect(host, port, EndConnect, null);
@@ -70,6 +73,7 @@ namespace QurrexMatch.Lib.Connection
 
         public void Disconnect()
         {
+            isConnected = false;
             isStopping = true;
             connectionsOpened--;
             client.Shutdown(SocketShutdown.Both);
@@ -84,26 +88,14 @@ namespace QurrexMatch.Lib.Connection
 
         public void SendMessage(byte[] data, int length)
         {
-            if (data.Length == 0) return;
+            if (data.Length == 0 || !isConnected) return;
             try
             {
-                client.BeginSend(data, 0, length, SocketFlags.None, out var erCode, EndSend, null);
+                client.Send(data, 0, length, SocketFlags.None, out var erCode);
             }
             catch (Exception e)
             {
                 onConnectionError.Invoke($"Error in begin send: {e.Message}");
-            }
-        }
-
-        private void EndSend(IAsyncResult ar)
-        {
-            try
-            {
-                client.EndSend(ar);
-            }
-            catch (Exception e)
-            {
-                onConnectionError.Invoke($"Error in end send: {e.Message}");
             }
         }
 
@@ -121,6 +113,7 @@ namespace QurrexMatch.Lib.Connection
                     EndReceive, state);
 
                 onStatusMessage("client is connected");
+                isConnected = true;
             }
             catch (Exception e)
             {
