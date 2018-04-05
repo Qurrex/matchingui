@@ -10,10 +10,11 @@ namespace QurrexMatch.LoadApp.Model.Presets
         {
             this.defaultSettings = defaultSettings;
             ImageIndex = 4;
-            Title = "Payload Fading In";
-            Description = "The price is fixed, but the payload grows in time to its maximum value.\n" +
-                          "A number of \"takers\" who place order at the exact market price.\n" +
-                          "Payload affects the number of \"takers\" and the interval between placing orders.";
+            Title = "Growing the Load level";
+            Description = "A simple case with growing TPS value.\n\n" +
+                          "The price is fixed.\n" +
+                          "The Load level grows to the maximum value.\n" +
+                          "Load level settings affect the maximum number of traders (threads) and the minimum interval between placing orders.";
         }
 
         public override TradersSettings Build(int payload)
@@ -70,8 +71,8 @@ namespace QurrexMatch.LoadApp.Model.Presets
             var sets = Build(payload);
             var reqPerSec = sets.PayloadSets.TradersCount * 1000M / (sets.PayloadSets.SleepInterval + 1) *
                             sets.PayloadSets.RequestPerIterationProb / 100M;
-            return $"{sets.PayloadSets.TradersCount} \"takers\".\n" +
-                $"~ {reqPerSec:F1} requests per second";
+            return $"{sets.PayloadSets.TradersCount} traders.\n" +
+                   $"~ {reqPerSec:F1} requests per second";
         }
     }
 }

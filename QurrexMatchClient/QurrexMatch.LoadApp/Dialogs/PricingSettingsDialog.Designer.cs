@@ -220,7 +220,7 @@
             this.Controls.Add(this.gbMode);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "PricingSettingsDialog";
-            this.Text = "Payload Settings";
+            this.Text = "Pricing Settings";
             this.gbMode.ResumeLayout(false);
             this.gbMode.PerformLayout();
             this.panelPriceSinus.ResumeLayout(false);

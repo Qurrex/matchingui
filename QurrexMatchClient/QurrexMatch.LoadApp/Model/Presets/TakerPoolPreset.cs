@@ -10,10 +10,12 @@ namespace QurrexMatch.LoadApp.Model.Presets
         {
             this.defaultSettings = defaultSettings;
             ImageIndex = 2;
-            Title = "Takers' Pool";
-            Description = "A simple case. The price is fixed, the payload does not change in time.\n" + 
-                          "A number of \"takers\" who place order at the exact market price.\n" +
-                          "Payload affects the number of \"takers\" and the interval between placing orders.";
+            Title = "Traders only";
+            Description = "A simple case. A number of traders who place order at the exact market price " +
+                          "make a deals with each other.\n\n" +
+                          "The price is fixed.\n" +
+                          "The Load level value does not change in time.\n" +
+                          "Load level settings affect the number of traders (threads) and the interval between placing orders.";
         }
 
         public override TradersSettings Build(int payload)
@@ -68,8 +70,8 @@ namespace QurrexMatch.LoadApp.Model.Presets
             var sets = Build(payload);
             var reqPerSec = sets.PayloadSets.TradersCount * 1000M / (sets.PayloadSets.SleepInterval + 1) *
                             sets.PayloadSets.RequestPerIterationProb / 100M;
-            return $"{sets.PayloadSets.TradersCount} \"takers\".\n" +
-                $"~ {reqPerSec:F1} requests per second";
+            return $"{sets.PayloadSets.TradersCount} traders.\n" +
+                   $"~ {reqPerSec:F1} requests per second";
         }
     }
 }

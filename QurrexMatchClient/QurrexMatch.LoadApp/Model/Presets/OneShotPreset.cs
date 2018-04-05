@@ -10,10 +10,12 @@ namespace QurrexMatch.LoadApp.Model.Presets
         {
             this.defaultSettings = defaultSettings;
             ImageIndex = 5;
-            Title = "Payload Fading In";
-            Description = "A number of traders place orders randomly at a \"fair\" price\n" +
-                          "that changes sinusoidal(ly?).\n" +
-                          "Another \"trader\" places places a superorder, that takes all the order book in one.";
+            Title = "One-shot trader";
+            Description = "A number of traders place orders randomly at the market price. " +
+                          "One-shot trader places a \"superorder\", that takes all placed orders.\n\n" +
+                          "The price changes according to the sinusoid.\n" +
+                          "The Load level value does not change in time.\n" +
+                          "Load level settings affect the number of traders (threads) and the interval between placing orders.";
         }
 
         public override TradersSettings Build(int payload)
@@ -72,7 +74,7 @@ namespace QurrexMatch.LoadApp.Model.Presets
             var sets = Build(payload);
             var reqPerSec = sets.PayloadSets.TradersCount * 1000M / (sets.PayloadSets.SleepInterval + 1) *
                             sets.PayloadSets.RequestPerIterationProb / 100M;
-            return $"{sets.PayloadSets.TradersCount} \"takers\" and {sets.TradeSets.OneShotTradersCount} \"supertraders\".\n" +
+            return $"{sets.PayloadSets.TradersCount} traders and {sets.TradeSets.OneShotTradersCount} \"one-shot traders\"\n" + 
                 $"~ {reqPerSec:F1} requests per second";
         }
     }

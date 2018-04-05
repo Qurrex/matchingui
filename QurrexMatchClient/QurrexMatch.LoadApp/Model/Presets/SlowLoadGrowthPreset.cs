@@ -10,10 +10,12 @@ namespace QurrexMatch.LoadApp.Model.Presets
         {
             this.defaultSettings = defaultSettings;
             ImageIndex = 7;
-            Title = "Slowly growing payload";
-            Description = "The price is sinusoidal, the payload grows in time to its maximum value.\n" +
-                          "A number of \"takers\" grows is a constant," +
-                          "but intervals between placing orders slowly shortens in time";
+            Title = "Changing the price and growing the Load level";
+            Description = "A number of traders grows constantly" +
+                          "but intervals between placing orders slowly shorten in time.\n\n"+
+                          "The price changes according to the sinusoid.\n" +
+                          "The Load level grows to the maximum value.\n" +
+                          "Load level settings affect the maximum number of traders (threads) and the minimum interval between placing orders.";
         }
 
         public override TradersSettings Build(int payload)
@@ -72,8 +74,8 @@ namespace QurrexMatch.LoadApp.Model.Presets
             var sets = Build(payload);
             var reqPerSec = sets.PayloadSets.TradersCount * 1000M / (sets.PayloadSets.SleepInterval + 1) *
                             sets.PayloadSets.RequestPerIterationProb / 100M;
-            return $"{sets.PayloadSets.TradersCount} \"takers\".\n" +
-                $"~ {reqPerSec:F1} requests per second";
+            return $"{sets.PayloadSets.TradersCount} traders.\n" +
+                   $"~ {reqPerSec:F1} requests per second";
         }
     }
 }

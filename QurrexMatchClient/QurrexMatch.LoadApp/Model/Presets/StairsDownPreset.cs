@@ -10,10 +10,10 @@ namespace QurrexMatch.LoadApp.Model.Presets
         {
             this.defaultSettings = defaultSettings;
             ImageIndex = 9;
-            Title = "Payload fading step by step";
-            Description = "Payload fades step by step.\n" +
-                          "Single instrument is traded, price remains untouched.\n" +
-                          "Payload affects the number of \"takers\" and the interval between placing orders.";
+            Title = "The Load level decreases step by step";
+            Description = "The price is fixed.\n" +
+                          "The Load level decreases every 5 seconds. In total there are 8 steps.\n" +
+                          "Load level settings affect the maximum number of traders (threads) and the minimum interval between placing orders.";
         }
 
         public override TradersSettings Build(int payload)
@@ -76,8 +76,8 @@ namespace QurrexMatch.LoadApp.Model.Presets
             var sets = Build(payload);
             var reqPerSec = sets.PayloadSets.TradersCount * 1000M / (sets.PayloadSets.SleepInterval + 1) *
                             sets.PayloadSets.RequestPerIterationProb / 100M;
-            return $"{sets.PayloadSets.TradersCount} \"takers\".\n" +
-                $"~ {reqPerSec:F1} requests per second";
+            return $"{sets.PayloadSets.TradersCount} traders.\n" +
+                   $"~ {reqPerSec:F1} requests per second";
         }
     }
 }

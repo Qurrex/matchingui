@@ -73,7 +73,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(105, 13);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Set the payload here";
+            this.label3.Text = "Set Load level";
             // 
             // tbDescription
             // 

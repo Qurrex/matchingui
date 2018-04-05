@@ -11,11 +11,11 @@ namespace QurrexMatch.LoadApp.Model.Presets
         {
             this.defaultSettings = defaultSettings;
             ImageIndex = 3;
-            Title = "Maker / Taker";
-            Description = "Another simple case. The price is fixed, the payload does not change in time.\n" +
-                          "A number of \"takers\" who place order at the exact market price\n" +
-                          "deal with one or two market makers." +
-                          "Payload affects mostly the number of \"takers\" and the interval between placing orders.";
+            Title = "Traders and market maker";
+            Description = "A number of traders who place order at the market price make a deals with one or two market makers.\n\n" +
+                          "The price changes according to the sinusoid.\n" +
+                          "The Load level value does not change in time.\n" +
+                          "Load level settings affects the number of traders (threads) and the interval between placing orders.";
         }
 
         public override TradersSettings Build(int payload)
@@ -82,8 +82,8 @@ namespace QurrexMatch.LoadApp.Model.Presets
                                                           1000M / sets.TradeSets.MilisecondsBeforUpdateMMLevels);
             var rps = reqPerSecTakers + makersReq;
 
-            var makersStr = sets.TradeSets.MakersCount > 1 ? "makers" : "maker";
-            return $"{sets.PayloadSets.TradersCount} \"takers\" and {sets.TradeSets.MakersCount} {makersStr}.\n" +
+            var makersStr = sets.TradeSets.MakersCount > 1 ? "market makers" : "market maker";
+            return $"{sets.PayloadSets.TradersCount} traders and {sets.TradeSets.MakersCount} {makersStr} " + 
                 $"~ {rps:F1} requests per second";
         }
     }
