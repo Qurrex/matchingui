@@ -23,6 +23,11 @@ namespace QurrexMatch.Lib.Connection
         public Logger onLogMessage;
 
         /// <summary>
+        /// called when the internal client has successfully connected
+        /// </summary>
+        private readonly Action onConnected;
+
+        /// <summary>
         /// internal client that actually connects to server
         /// </summary>
         private TcpAsyncClient client;
@@ -36,6 +41,11 @@ namespace QurrexMatch.Lib.Connection
         /// server's URI
         /// </summary>
         private string uri;
+
+        public SafeTcpClient(Action onConnected)
+        {
+            this.onConnected = onConnected;
+        }
 
         public void Connect(string uri)
         {
@@ -62,9 +72,12 @@ namespace QurrexMatch.Lib.Connection
                 if (client != null)
                     client.SendMessage(msg, length);
             }
+            catch (NullReferenceException)
+            {
+            }
             catch (Exception e)
             {
-                onLogMessage?.LogMessage(e.ToString(), LoggingLevel.Error);
+                onLogMessage?.LogMessage("Send msg error - " + e, LoggingLevel.Error);
                 Reconnect();
             }
         }
@@ -78,7 +91,7 @@ namespace QurrexMatch.Lib.Connection
             }
             catch (Exception e)
             {
-                onLogMessage?.LogMessage(e.Message, LoggingLevel.Error);
+                onLogMessage?.LogMessage("Connection close error: " + e.Message, LoggingLevel.Error);
             }
         }
 
@@ -99,7 +112,7 @@ namespace QurrexMatch.Lib.Connection
             try
             {
                 if (!isAlive) return;
-                client = new TcpAsyncClient
+                client = new TcpAsyncClient(onConnected)
                 {
                     onMessage = onServerMessage,
                     onStatusMessage = msg => onLogMessage?.LogMessage(msg, LoggingLevel.Verbose)
@@ -114,7 +127,7 @@ namespace QurrexMatch.Lib.Connection
             }
             catch (Exception e)
             {
-                onLogMessage?.LogMessage(e.Message, LoggingLevel.Error, LogMessageCode.ConnectionLost);
+                onLogMessage?.LogMessage("Error while connecting: " + e.Message, LoggingLevel.Error, LogMessageCode.ConnectionLost);
                 client = null;
                 new Task(() =>
                 {

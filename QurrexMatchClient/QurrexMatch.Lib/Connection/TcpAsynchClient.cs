@@ -44,14 +44,30 @@ namespace QurrexMatch.Lib.Connection
         /// </summary>
         public Action<string> onStatusMessage;
 
+        /// <summary>
+        /// set to true to break the reconnecting loop
+        /// </summary>
         private volatile bool isStopping;
 
+        /// <summary>
+        /// set to true on EndConnect
+        /// </summary>
         private volatile bool isConnected;
+
+        /// <summary>
+        /// called when the client is connected
+        /// </summary>
+        private readonly Action onConnected;
 
         /// <summary>
         /// internal socket client
         /// </summary>
         private Socket client;
+
+        public TcpAsyncClient(Action onConnected)
+        {
+            this.onConnected = onConnected;
+        }
 
         public void Connect(string uri)
         {
@@ -113,6 +129,7 @@ namespace QurrexMatch.Lib.Connection
                     EndReceive, state);
 
                 onStatusMessage("client is connected");
+                onConnected();
                 isConnected = true;
             }
             catch (Exception e)

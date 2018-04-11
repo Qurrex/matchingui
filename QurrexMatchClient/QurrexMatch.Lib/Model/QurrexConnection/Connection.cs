@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using QurrexMatch.Lib.Connection;
 using QurrexMatch.Lib.Model.Enumerations;
@@ -77,6 +76,17 @@ namespace QurrexMatch.Lib.Model.QurrexConnection
         /// </summary>
         private readonly Random rand = new Random();
 
+        /// <summary>
+        /// data obtained length - the data that is still to be parsed
+        /// </summary>
+        private volatile int bytesUnparsed;
+
+        /// <summary>
+        /// max message's size that is still left to be read
+        /// when exceeded, new messages are not being sent
+        /// </summary>
+        private const int MaxBytesUnparsed = 1024;
+
         public Connection(string uri, Logger logMessage, int connectionId)
         {
             this.uri = uri;
@@ -91,11 +101,11 @@ namespace QurrexMatch.Lib.Model.QurrexConnection
         public void Open()
         {
             nextSessionId = 0;
-            conn = new SafeTcpClient
-            {
-                onLogMessage = logMessage,
-                onServerMessage = OnServerMessage                
-            };
+            conn = new SafeTcpClient(() => { nextSessionId = 0; })
+                {
+                    onLogMessage = logMessage,
+                    onServerMessage = OnServerMessage
+                };
 
             try
             {
@@ -134,25 +144,26 @@ namespace QurrexMatch.Lib.Model.QurrexConnection
         /// <summary>
         /// send a request to server: new order, cancel order
         /// </summary>
-        public void SendRequest(BaseRequest req)
+        public bool SendRequest(BaseRequest req)
         {
             if (!Connected)
             {
                 logMessage.LogMessage("Not connected", LoggingLevel.Verbose);
-                return;
+                return false;
             }
+
+            if (bytesUnparsed > MaxBytesUnparsed)
+                return false;
+
             req.RequestId = MakeReuqestId();
 
-            lock (this)
-            {
-                req.SessionId = Interlocked.Increment(ref nextSessionId);
-
-                var bytes = req.Serialize();
-                requestTimeById.TryAdd(req.RequestId, DateTime.Now);
-                Interlocked.Increment(ref requestsWaitingForResponses);
-                //var str = string.Join(",", bytes.data.Take(bytes.length).Select(d => $"{d:X2}"));
-                conn.SendBytes(bytes.data, bytes.length);
-            }
+            req.SessionId = Interlocked.Increment(ref nextSessionId);
+            var bytes = req.Serialize();
+            requestTimeById.TryAdd(req.RequestId, DateTime.Now);
+            Interlocked.Increment(ref requestsWaitingForResponses);
+            //var str = string.Join(",", bytes.data.Take(bytes.length).Select(d => $"{d:X2}"));
+            conn.SendBytes(bytes.data, bytes.length);
+            return true;
         }
 
         /// <summary>
@@ -161,11 +172,21 @@ namespace QurrexMatch.Lib.Model.QurrexConnection
         /// </summary>
         private void OnServerMessage(ByteBuffer byteBuffer, DateTime receivedTime)
         {
-            logMessage.LogMessage("Got a message from server", LoggingLevel.Critical, LogMessageCode.ConnectionSetUp);
-            var resps = parser.ParseResponse(byteBuffer);
-            if (resps.Count == 0) return;
-            resps.ForEach(r => r.responseReceivedTime = receivedTime);
+            var len = byteBuffer.length;
+            bytesUnparsed += len;
+            List<BaseResponse> resps;
+            try
+            {
+                logMessage.LogMessage("Got a message from server", LoggingLevel.Critical, LogMessageCode.ConnectionSetUp);
+                resps = parser.ParseResponse(byteBuffer);
+                if (resps.Count == 0) return;                
+            }
+            finally
+            {
+                bytesUnparsed -= len;
+            }
 
+            resps.ForEach(r => r.responseReceivedTime = receivedTime);
             foreach (var resp in resps)
             {
                 var processingTime = 0U;

@@ -223,7 +223,7 @@ namespace QurrexMatch.LoadApp.Model
             }
             catch (Exception e)
             {
-                logger.LogMessage($"{e.GetType().Name}: {e.Message}", LoggingLevel.Error);
+                logger.LogMessage($"Error while parsing: {e.GetType().Name} - {e.Message}", LoggingLevel.Error);
                 // almost all the errors ends up
                 // restarting the connection
                 connectionPool[connectionId].Reconnect();
@@ -299,7 +299,11 @@ namespace QurrexMatch.LoadApp.Model
         {
             if (report.ExecReport.DealsCount == 0) return;
             var tickerId = report.OriginRequest.InstrumentId;
-            var ticker = tickerById[tickerId];
+            if (!tickerById.TryGetValue(tickerId, out var ticker))
+            {
+                logger.LogMessage($"Error while parsing: ticker #{tickerId} was not found", LoggingLevel.Error);
+                return;
+            }
             
             double totalPrice = 0, totalAmount = 0;
 

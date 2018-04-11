@@ -207,11 +207,11 @@ namespace QurrexMatch.LoadApp.Model
             statistics.IncrementOrderRequestsSend();
             try
             {
-                connection.SendRequest(req);
+                if (connection.SendRequest(req))
+                    statistics.IncrementSendRequestErrorCount();
             }
             catch
             {
-                statistics.IncrementSendRequestErrorCount();
             }
         }
 
@@ -224,11 +224,11 @@ namespace QurrexMatch.LoadApp.Model
             statistics.IncrementCancelRequestsSend();
             try
             {
-                connection.SendRequest(req);
+                if (connection.SendRequest(req))
+                    statistics.IncrementSendRequestErrorCount();
             }
             catch
             {
-                statistics.IncrementSendRequestErrorCount();
             }
         }
 
@@ -242,17 +242,17 @@ namespace QurrexMatch.LoadApp.Model
             statistics.IncrementCancelRequestsSend();
             try
             {
-                connection.SendRequest(new MassCancelRequest
+                if (connection.SendRequest(new MassCancelRequest
                 {
                     InstrumentId = tickerId,
                     ClearingAccountId = ClearingAccountId,
                     TraderAccountId = AccountId,
                     CancelMode = MassCancelMode.Connect
-                });
+                }))
+                    statistics.IncrementSendRequestErrorCount();
             }
             catch
             {
-                statistics.IncrementSendRequestErrorCount();
             }
         }
     }
