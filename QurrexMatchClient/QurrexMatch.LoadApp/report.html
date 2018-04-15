@@ -301,10 +301,9 @@
             window.rawdata.roundtripTimes.Vectors.forEach(element => { element.vector.forEach(x => fullStatistics.push(x)) });
             fullStatistics = fullStatistics.filter(x => x != 0); // FIXME: Пока в отчете попадаются нулевые задержки надо фильтровать.
             fullStatistics.sortNumbers();
-            fullStatistics = fullStatistics.map(el=>el/1000) // переведем микросекунды в миллисекунды
             var min = fullStatistics[0];
-			var maxPercentile = 0.99;
-            var maxIndex = Math.ceil(fullStatistics.length*maxPercentile-1); 
+			var maxPercentile = 99; // должно быть не больше 100
+            var maxIndex = Math.ceil(fullStatistics.length*maxPercentile/100-1); 
             var max = fullStatistics[maxIndex];
             var increment = (max - min) / series.length;
             var previndex = 0;
@@ -323,10 +322,10 @@
             var p_max = this.getPercentile(fullStatistics, maxPercentile, true); // Этот процентиль используется, чтобы ограничить график по оси X
 
             new Highcharts.chart(name,{
-                chart:{type:"line"},
+                chart:{type:"spline"},
                 title:{text:"Probability Distribution: Latency"},
                 tooltip:{
-                    headerFormat: 'Latency: <b>{point.x} ms</b>',
+                    headerFormat: 'Latency: <b>{point.x} µs</b>',
                     pointFormat:'',
                     enabled: true
                 },
@@ -338,6 +337,11 @@
                 },
                 xAxis:{
                     title:{text:"Latency, ms"},
+                    labels: {
+                        formatter: function () {
+                            return this.value/1000 + 'ms'
+                        }
+                    },
                     max: p_max,
 					plotBands: [{
                         color: 'yellow',
@@ -361,12 +365,7 @@
                         value: p_98,
                         width: 1,
                         label: { text: '98%' }
-                    }],
-                    labels: {
-                        formatter: function () {
-                            return this.value + 'ms'
-                        }
-                    }
+                    }]
                 },
                 legend: {enabled: false},
                 series: [{
