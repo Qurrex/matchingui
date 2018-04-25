@@ -38,7 +38,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             else if (sets.PayloadSets.Mode == PayloadSettingsMode.FadeIn)
                 tbModeFadeIn.Checked = true;
             else if (sets.PayloadSets.Mode == PayloadSettingsMode.Stairs)
-                tbModeSteps.Checked = true;
+                tbModeStairsUp.Checked = true;
             else
                 tbModeStairsDown.Checked = true;
         }
@@ -47,7 +47,9 @@ namespace QurrexMatch.LoadApp.Dialogs
         {
             panelDistrSinus.Visible = tbDistrSinus.Checked;
             panelFadeIn.Visible = tbModeFadeIn.Checked;
-            panelSetsSteps.Visible = tbModeSteps.Checked || tbModeStairsDown.Checked;
+            panelSetsSteps.Visible = tbModeStairsUp.Checked || tbModeStairsDown.Checked;
+            pictureBox3.Visible = tbModeStairsUp.Checked;
+            pictureBox4.Visible = tbModeStairsDown.Checked;
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -68,7 +70,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             sets.PayloadSets.SecondsPerStep = tbStairInterval.Text.ToInt();
             sets.PayloadSets.Mode = tbDistrSinus.Checked ? PayloadSettingsMode.Sinusoidal :
                 tbModeFadeIn.Checked ? PayloadSettingsMode.FadeIn :
-                tbModeSteps.Checked ? PayloadSettingsMode.Stairs :
+                tbModeStairsUp.Checked ? PayloadSettingsMode.Stairs :
                 tbModeStairsDown.Checked ? PayloadSettingsMode.StairsDown :
                 PayloadSettingsMode.Even;
             sets.SaveSettings();

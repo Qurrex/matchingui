@@ -214,6 +214,7 @@
     </Content>
     <None Include="Resources\fading_in.png" />
     <None Include="Resources\stairs.png" />
+    <None Include="Resources\stairs_down.png" />
     <Content Include="settings.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

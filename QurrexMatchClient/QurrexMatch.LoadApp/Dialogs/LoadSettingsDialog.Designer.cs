@@ -43,7 +43,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             this.label3 = new System.Windows.Forms.Label();
             this.gbPayloadDistr = new System.Windows.Forms.GroupBox();
             this.tbModeStairsDown = new System.Windows.Forms.RadioButton();
-            this.tbModeSteps = new System.Windows.Forms.RadioButton();
+            this.tbModeStairsUp = new System.Windows.Forms.RadioButton();
             this.tbModeFadeIn = new System.Windows.Forms.RadioButton();
             this.tbDistrSinus = new System.Windows.Forms.RadioButton();
             this.tbDistrEven = new System.Windows.Forms.RadioButton();
@@ -66,6 +66,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             this.tbStairsCount = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.gbPayloadDistr.SuspendLayout();
             this.panelDistrSinus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -73,6 +74,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.panelSetsSteps.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -112,7 +114,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             // gbPayloadDistr
             // 
             this.gbPayloadDistr.Controls.Add(this.tbModeStairsDown);
-            this.gbPayloadDistr.Controls.Add(this.tbModeSteps);
+            this.gbPayloadDistr.Controls.Add(this.tbModeStairsUp);
             this.gbPayloadDistr.Controls.Add(this.tbModeFadeIn);
             this.gbPayloadDistr.Controls.Add(this.tbDistrSinus);
             this.gbPayloadDistr.Controls.Add(this.tbDistrEven);
@@ -135,16 +137,16 @@ namespace QurrexMatch.LoadApp.Dialogs
             this.tbModeStairsDown.UseVisualStyleBackColor = true;
             this.tbModeStairsDown.CheckedChanged += new System.EventHandler(this.tbDistrEven_CheckedChanged);
             // 
-            // tbModeSteps
+            // tbModeStairsUp
             // 
-            this.tbModeSteps.AutoSize = true;
-            this.tbModeSteps.Location = new System.Drawing.Point(13, 93);
-            this.tbModeSteps.Name = "tbModeSteps";
-            this.tbModeSteps.Size = new System.Drawing.Size(68, 17);
-            this.tbModeSteps.TabIndex = 3;
-            this.tbModeSteps.Text = "Stairs Up";
-            this.tbModeSteps.UseVisualStyleBackColor = true;
-            this.tbModeSteps.CheckedChanged += new System.EventHandler(this.tbDistrEven_CheckedChanged);
+            this.tbModeStairsUp.AutoSize = true;
+            this.tbModeStairsUp.Location = new System.Drawing.Point(13, 93);
+            this.tbModeStairsUp.Name = "tbModeStairsUp";
+            this.tbModeStairsUp.Size = new System.Drawing.Size(68, 17);
+            this.tbModeStairsUp.TabIndex = 3;
+            this.tbModeStairsUp.Text = "Stairs Up";
+            this.tbModeStairsUp.UseVisualStyleBackColor = true;
+            this.tbModeStairsUp.CheckedChanged += new System.EventHandler(this.tbDistrEven_CheckedChanged);
             // 
             // tbModeFadeIn
             // 
@@ -303,6 +305,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             // 
             // panelSetsSteps
             // 
+            this.panelSetsSteps.Controls.Add(this.pictureBox4);
             this.panelSetsSteps.Controls.Add(this.tbStairInterval);
             this.panelSetsSteps.Controls.Add(this.label9);
             this.panelSetsSteps.Controls.Add(this.tbStairsCount);
@@ -355,6 +358,15 @@ namespace QurrexMatch.LoadApp.Dialogs
             this.pictureBox3.TabIndex = 0;
             this.pictureBox3.TabStop = false;
             // 
+            // pictureBox4
+            // 
+            this.pictureBox4.Image = global::QurrexMatch.LoadApp.Properties.Resources.stairs_down;
+            this.pictureBox4.Location = new System.Drawing.Point(27, 2);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(99, 44);
+            this.pictureBox4.TabIndex = 15;
+            this.pictureBox4.TabStop = false;
+            // 
             // LoadSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -388,6 +400,7 @@ namespace QurrexMatch.LoadApp.Dialogs
             this.panelSetsSteps.ResumeLayout(false);
             this.panelSetsSteps.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -416,7 +429,7 @@ namespace QurrexMatch.LoadApp.Dialogs
         private System.Windows.Forms.TextBox tbFadeInPeriod;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.RadioButton tbModeSteps;
+        private System.Windows.Forms.RadioButton tbModeStairsUp;
         private System.Windows.Forms.Panel panelSetsSteps;
         private System.Windows.Forms.TextBox tbStairsCount;
         private System.Windows.Forms.Label label8;
@@ -424,5 +437,6 @@ namespace QurrexMatch.LoadApp.Dialogs
         private System.Windows.Forms.TextBox tbStairInterval;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.RadioButton tbModeStairsDown;
+        private System.Windows.Forms.PictureBox pictureBox4;
     }
 }
